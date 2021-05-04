@@ -60,16 +60,28 @@ public class ClientHandler {
     }
 
     public void readMessages() throws IOException{
+
         while (true) {
-            String strFromClient = in.readUTF();
-            System.out.println("от " + name + ": " + strFromClient);
-            if (strFromClient.equals("/end")){
-                return;
+            String str = in.readUTF();
+            if (str.startsWith("/")) {
+                if (str.equals("/end")) {
+                    break;
+                }
+                if (str.startsWith("/w ")) {
+                    String[] tokens = str.split("\\s");
+                    String nick = tokens[1];
+                    String msg = str.substring(4 + nick.length());
+                    myServer.whisperMessage(this, nick, msg);
+                }
+                continue;
             }
-            myServer.broadcastMsg(name + ": " + strFromClient);
+            myServer.broadcastMsg(name + ": " + str);
         }
 
+
     }
+
+
 
     public void sendMsg(String msg) {
         try {

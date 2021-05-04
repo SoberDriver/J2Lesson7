@@ -43,6 +43,16 @@ public class MyServer {
         return false;
     }
 
+    public synchronized void whisperMessage(ClientHandler from, String toClient, String msg) {
+        for (ClientHandler o : clients) {
+            if (o.getName().equals(toClient)) {
+                o.sendMsg("от " + from.getName() + ": " + msg);
+                from.sendMsg("пользователю " + toClient + ": " + msg);
+                return;
+            }
+        }
+    }
+
     public synchronized void broadcastMsg(String msg) {
         for (ClientHandler o: clients) {
             o.sendMsg(msg);
