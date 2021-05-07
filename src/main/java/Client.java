@@ -22,6 +22,7 @@ public class Client extends JFrame {
     public Client () {
         try {
             openConnection();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -39,6 +40,7 @@ public class Client extends JFrame {
                 public void run() {
                     try {
                         while (true) {
+
                             String strFromServer = in.readUTF();
                             if(strFromServer.startsWith("/authok")) {
                                 break;

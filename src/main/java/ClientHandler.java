@@ -23,6 +23,7 @@ public class ClientHandler {
             this.out = new DataOutputStream(socket.getOutputStream());
             new Thread(() -> {
                 try {
+
                     authentication();
                     readMessages();
                 } catch (IOException e) {
@@ -31,6 +32,7 @@ public class ClientHandler {
                     closeConnection();
                 }
             }).start();
+
         }catch (IOException e) {
             throw new RuntimeException("Проблемы при создании обработчика клиента.");
         }
@@ -72,6 +74,9 @@ public class ClientHandler {
                     String nick = tokens[1];
                     String msg = str.substring(4 + nick.length());
                     myServer.whisperMessage(this, nick, msg);
+                }
+                if (str.equals("/clients")) {
+                    myServer.broadcastClientsList();
                 }
                 continue;
             }
