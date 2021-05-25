@@ -48,6 +48,7 @@ public class ClientHandler {
                         if (!myServer.isNickBusy(nick)){
                             sendMsg("/authok " + nick);
                             name = nick;
+                            sendMsg("/help для списка команд");
                             myServer.broadcastMsg(name + " зашел в чат.");
                             myServer.subscribe(this);
                             return;
@@ -75,8 +76,22 @@ public class ClientHandler {
                     String msg = str.substring(4 + nick.length());
                     myServer.whisperMessage(this, nick, msg);
                 }
+                if (str.startsWith("/nc")) {
+                    String[] parts = str.split("\\s");
+                    String newNick = myServer.getAuthService().changeNickname(parts[1], parts[2]);
+                    if (newNick != null) {
+                        myServer.broadcastMsg("Клиент " + parts[1] + " поменял на ник на " + newNick);
+                        myServer.broadcastClientsList();
+                    }
+                }
                 if (str.equals("/clients")) {
                     myServer.broadcastClientsList();
+                }
+                if (str.equals("/help")) {
+                    sendMsg("/clients - для отображения списка клиентов онлайн\n"+
+                            "/nc [старый ник] [новый ник]- для смены ника\n"+
+                            "/w [ник клиента] [ваше сообщение] - личное сообщение клиенту\n"+
+                            "/end - завершить работу клиента ");
                 }
                 continue;
             }

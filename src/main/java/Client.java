@@ -33,6 +33,7 @@ public class Client extends JFrame {
 
         try {
             socket = new Socket("localhost", 8189);
+            socket.setSoTimeout(120000);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
             Thread t = new Thread(new Runnable() {
@@ -40,9 +41,9 @@ public class Client extends JFrame {
                 public void run() {
                     try {
                         while (true) {
-
                             String strFromServer = in.readUTF();
                             if(strFromServer.startsWith("/authok")) {
+                                socket.setSoTimeout(0);
                                 break;
                             }
                             chatArea.append(strFromServer + "\n");
