@@ -4,10 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Client extends JFrame {
 
@@ -41,8 +40,10 @@ public class Client extends JFrame {
                 public void run() {
                     try {
                         while (true) {
+                            clearHistory();
                             String strFromServer = in.readUTF();
                             if(strFromServer.startsWith("/authok")) {
+                                loadHistory();
                                 socket.setSoTimeout(0);
                                 break;
                             }
@@ -55,6 +56,7 @@ public class Client extends JFrame {
                             }
                             chatArea.append(strFromServer);
                             chatArea.append("\n");
+                            saveHistory();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -89,6 +91,51 @@ public class Client extends JFrame {
             } catch (IOException e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(null, "Ошибка отправления сообщения.");
+            }
+        }
+    }
+    private void clearHistory() throws IOException{
+        PrintWriter writer = new PrintWriter("history.txt");
+        writer.print("");
+        writer.close();
+    }
+    private void saveHistory() throws IOException {
+        try {
+            File history = new File("history.txt");
+            if (!history.exists()) {
+                System.out.println("Файла истории нет,создадим его");
+                history.createNewFile();
+            }
+            PrintWriter fileWriter = new PrintWriter(new FileWriter(history, false));
+
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(chatArea.getText());
+            bufferedWriter.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadHistory() throws IOException {
+        int posHistory = 100;
+        File history = new File("history.txt");
+        ArrayList<String> historyList = new ArrayList<>();
+        FileInputStream in = new FileInputStream(history);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+
+        String temp;
+        while ((temp = bufferedReader.readLine()) != null) {
+            historyList.add(temp);
+        }
+
+        if (historyList.size() > posHistory) {
+            for (int i = historyList.size() - posHistory; i <= (historyList.size() - 1); i++) {
+                chatArea.append(historyList.get(i) + "\n");
+            }
+        } else if (historyList.size() < posHistory){
+            for (int i = 0; i < historyList.size(); i++) {
+                chatArea.append(historyList.get(i) + "\n");
             }
         }
     }
